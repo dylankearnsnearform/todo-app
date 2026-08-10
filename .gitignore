@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+venv/
+.venv/
+
+# Environment
+.env
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Playwright artifacts (traces, videos, screenshots, HTML report)
+test-results/
+playwright-report/
+*.zip
+
+# Local databases
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# Tooling installs (not part of the deliverable; keep _bmad-output/ which IS)
+.claude/
+_bmad/

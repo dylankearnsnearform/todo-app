@@ -1,0 +1,58 @@
+[project]
+name = "nearform-python"
+version = "0.1.0"
+description = "Todo App — server-rendered hypermedia monolith (FastAPI + Jinja2 + HTMX + SQLite)"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.139,<0.140",
+    "uvicorn[standard]",
+    "jinja2",
+    "sqlalchemy>=2.0,<2.1",
+    "python-multipart",  # form-encoded HTMX POSTs
+]
+
+[project.optional-dependencies]
+# Everything needed to run the test suite. Install with:  pip install -e ".[test]"
+test = [
+    "pytest>=8.0",
+    "pytest-playwright>=0.5",   # brings in playwright + pytest-base-url
+    "httpx",                    # FastAPI TestClient transport
+    "faker",                    # dynamic, collision-free test data
+    "pytest-cov",               # coverage for in-process (TestClient) tests
+    "axe-playwright-python",    # axe-core WCAG scans driven from Playwright (E2E a11y)
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+# Ship only the app package; tests are not part of the wheel.
+include = ["app*"]
+
+# ---------------------------------------------------------------------------
+# pytest configuration
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+    "unit: fast, isolated logic tests (no I/O, no DB, no browser)",
+    "integration: in-process tests through FastAPI TestClient (DB allowed)",
+    "api: HTTP/route contract tests (subset of integration, asserts status + fragment shape)",
+    "e2e: full browser tests via Playwright against a live server (slow)",
+]
+# E2E tests spin up a real browser + server, so they are opt-in by default.
+# Run them explicitly with:  pytest -m e2e   (or the `make test-e2e` target).
+# Everything except e2e runs on a bare `pytest`.
+# NOTE: the default selection is applied in tests/conftest.py (pytest_collection_modifyitems)
+#       so `pytest -m e2e` still works without fighting a hard-coded -m here.
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

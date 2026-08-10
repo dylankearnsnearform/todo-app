@@ -1,0 +1,21 @@
+<li id="todo-{{ todo.id }}" class="todo-item{% if todo.completed %} completed{% endif %}">
+  <input
+    type="checkbox"
+    id="toggle-{{ todo.id }}"
+    class="todo-toggle"
+    {% if todo.completed %}checked{% endif %}
+    aria-label="Mark &quot;{{ todo.description }}&quot; {% if todo.completed %}active{% else %}complete{% endif %}"
+    hx-post="/todos/{{ todo.id }}/toggle"
+    hx-target="#todo-{{ todo.id }}"
+    hx-swap="outerHTML"
+  />
+  <span class="todo-description">{{ todo.description }}</span>
+  <button
+    type="button"
+    class="todo-delete"
+    aria-label="Delete &quot;{{ todo.description }}&quot;"
+    hx-delete="/todos/{{ todo.id }}"
+    hx-target="#todo-{{ todo.id }}"
+    hx-swap="outerHTML"
+  >Delete</button>
+</li>

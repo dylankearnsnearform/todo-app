@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Todos</title>
+    <link rel="stylesheet" href="/static/app.css" />
+    <script src="/static/htmx.min.js" defer></script>
+    <script>
+      // AD-5: htmx does not swap non-2xx responses by default. Route the add
+      // form's 422 validation fragment into its error slot so the message is
+      // shown. Scoped to #add-form so it never hijacks other routes' 422s.
+      document.addEventListener("htmx:beforeSwap", function (evt) {
+        var elt = evt.detail.requestConfig && evt.detail.requestConfig.elt;
+        if (
+          evt.detail.xhr &&
+          evt.detail.xhr.status === 422 &&
+          elt &&
+          elt.closest &&
+          elt.closest("#add-form")
+        ) {
+          evt.detail.shouldSwap = true;
+          evt.detail.target = document.getElementById("add-error");
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <main class="app">
+      <h1>Todos</h1>
+      <!-- Add form: success appends the new item fragment to #todo-list; a 422
+           validation response is routed to #add-error (see beforeSwap handler). -->
+      <form
+        id="add-form"
+        class="add-form"
+        hx-post="/todos"
+        hx-target="#todo-list"
+        hx-swap="beforeend"
+        hx-on::after-request="if(event.detail.successful){this.reset();document.getElementById('add-error').innerHTML='';}"
+      >
+        <input
+          type="text"
+          name="description"
+          aria-label="Todo description"
+          placeholder="Add a todo…"
+          autocomplete="off"
+          maxlength="500"
+        />
+        <button type="submit">Add</button>
+      </form>
+      <!-- Error slot: role comes from the injected _error.html (role="alert"). -->
+      <div id="add-error" aria-live="polite"></div>
+      <!-- Stable list container per AD-7; mutation routes (1.2–1.4) target #todo-list -->
+      <ul id="todo-list" class="todo-list">
+        {% for todo in todos %}{% include "_todo_item.html" %}{% endfor %}
+      </ul>
+    </main>
+  </body>
+</html>
